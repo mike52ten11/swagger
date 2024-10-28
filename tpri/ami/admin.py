@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (   User, 
-                        PowerUser, 
+                        User_Banding_ElectricNumber, 
                         Device, 
                         ElectricNumber, 
                         ElectricNumber_Device_Band
@@ -14,10 +14,10 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ['username']
 
 
-@admin.register(PowerUser)
+@admin.register(User_Banding_ElectricNumber)
 class PowerUserAdmin(admin.ModelAdmin):
-    list_display = ['electricnumber', 'account', 'registered', 'regdate']
-    search_fields = ['electricnumber', 'account']
+    list_display = ['electricnumber', 'user', 'registered', 'regdate']
+    search_fields = ['electricnumber', 'user']
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
@@ -26,7 +26,7 @@ class DeviceAdmin(admin.ModelAdmin):
     search_fields = ['deviceuuid']
 
 @admin.register(ElectricNumber)
-class DeviceDataAdmin(admin.ModelAdmin):
+class ElectricNumberAdmin(admin.ModelAdmin):
     list_display = ['electricnumber', 'name']
     list_filter = ['electricnumber']
     search_fields = ['electricnumber'] 
@@ -37,15 +37,15 @@ class ElectricNumber_Device_Band_Admin(admin.ModelAdmin):
     list_display = ('electric_name', 'device_name', 'registered', 'createtime')
     list_filter = ('registered', 'createtime')
     search_fields = (
-        'electric__electricnumber',
-        'electric__name',
+        'electricnumber__electricnumber',
+        'electricnumber__name',
         'device__deviceuuid',
         'device__name'
     )
     readonly_fields = ('registered', 'createtime')
     
     def electric_name(self, obj):
-        return f"{obj.electric.name} ({obj.electric.electricnumber})"
+        return f"{obj.electricnumber.name} ({obj.electricnumber.electricnumber})"
     electric_name.short_description = 'Electric Number Name'
     
     def device_name(self, obj):
@@ -56,7 +56,7 @@ class ElectricNumber_Device_Band_Admin(admin.ModelAdmin):
     fieldsets = (
         ('Binding Information', {
             'fields': (
-                'electric',
+                'electricnumber',
                 'device',
             )
         }),
@@ -69,11 +69,11 @@ class ElectricNumber_Device_Band_Admin(admin.ModelAdmin):
     )
     
     # 改善關聯對象的選擇介面
-    autocomplete_fields = ['electric', 'device']
+    autocomplete_fields = ['electricnumber', 'device']
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         # 優化下拉選單的顯示
-        if db_field.name == "electric":
+        if db_field.name == "electricnumber":
             kwargs["queryset"] = ElectricNumber.objects.filter(registered=True)
         if db_field.name == "device":
             kwargs["queryset"] = Device.objects.filter(registered=True)

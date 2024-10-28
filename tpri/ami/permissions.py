@@ -1,7 +1,7 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 class IsAdminOrAllowedEndpoint(BasePermission):
-    allowed_endpoints = ['userregistration','tokenmanagement','poweruserregister','deviceregister']
+    allowed_endpoints = ['userregistration','userelectricnumberbinding','tokenmanagement','poweruserregister','deviceregister']
 
     def has_permission(self, request, view):
         # 管理員可以訪問所有 API

@@ -9,8 +9,8 @@ from zoneinfo import ZoneInfo
 # 配置
 LOCAL_DB_PATH = r'db.sqlite3'
 ENDPOINT = 'http://10.52.15.201:80'
-TOKEN = '284c9497643c60bffaf0f6880a317fa1a21adfd6'
-Admin_TOKEN = '0158f46bd0fb61c03f6ffff33d9f1eb03d28e329'
+TOKEN = 'ee10d9bdfa9eff10eb9321a71a7cebeeb65f2fd4'
+Admin_TOKEN = '43087078d191b314f9350084b27e7f7b6071fe18'
 
 class Admin:
     class Device:
@@ -32,11 +32,34 @@ class Admin:
         def delete(self):
             pass
 
-        def disable(self):    
-            pass
+        def disable(self, data):    
+            API_ENDPOINT = f'{ENDPOINT}/ami-api/device-register/'
+            headers = {'Authorization': f'Token {Admin_TOKEN}'}       
+            data['registered'] = 0 
+            try:
+                response = requests.patch(API_ENDPOINT, json=data, headers=headers)
+                response.raise_for_status()
+                print(f"Data sent successfully: {response.json()}")
+                return True
 
-        def enable(self):    
-            pass
+            except requests.exceptions.RequestException as e:
+                print(f"Error sending data: {response.json()}")
+                return False 
+
+        def enable(self, data):    
+            API_ENDPOINT = f'{ENDPOINT}/ami-api/device-register/'
+            headers = {'Authorization': f'Token {Admin_TOKEN}'}     
+            data['registered'] = 1
+            
+            try:
+                response = requests.patch(API_ENDPOINT, json=data, headers=headers)
+                response.raise_for_status()
+                print(f"Data sent successfully: {response.json()}")
+                return True
+
+            except requests.exceptions.RequestException as e:
+                print(f"Error sending data: {response.json()}")
+                return False 
 
         def rename(self,data):
             API_ENDPOINT = f'{ENDPOINT}/ami-api/device-register/'
@@ -93,11 +116,36 @@ class Admin:
         def delete(self):
             pass
 
-        def disable(self):    
-            pass
+        def disable(self, data):    
+            API_ENDPOINT = f'{ENDPOINT}/ami-api/electricnumber-register/'
+            headers = {'Authorization': f'Token {Admin_TOKEN}'}     
+            data['registered'] = 0  
+            
+            try:
+                response = requests.patch(API_ENDPOINT, json=data, headers=headers)
+                response.raise_for_status()
+                print(f"Data sent successfully: {response.json()}")
+                return True
 
-        def enable(self):    
-            pass
+            except requests.exceptions.RequestException as e:
+                print(f"Error sending data: {response.json()}")
+                return False 
+
+        def enable(self, data):   
+            API_ENDPOINT = f'{ENDPOINT}/ami-api/electricnumber-register/'
+            headers = {'Authorization': f'Token {Admin_TOKEN}'}     
+            data['registered'] = 1
+            
+            try:
+                response = requests.patch(API_ENDPOINT, json=data, headers=headers)
+                response.raise_for_status()
+                print(f"Data sent successfully: {response.json()}")
+                return True
+
+            except requests.exceptions.RequestException as e:
+                print(f"Error sending data: {response.json()}")
+                return False 
+
 
         def rename(self,data):
             API_ENDPOINT = f'{ENDPOINT}/ami-api/electricnumber-register/'
@@ -157,6 +205,23 @@ class Customer:
             response.raise_for_status()
             print(f"Data sent successfully: {response.json()}")
             return True
+        except requests.exceptions.RequestException as e:
+            print(f"Error sending data: {response.json()}")
+            return False
+
+    def banding(self, data):
+        API_ENDPOINT = f'{ENDPOINT}/ami-api/user-binding/'
+        headers = {
+            'Authorization': f'Token {TOKEN}',
+            'Content-Type': 'application/json'
+        }        
+        
+        try:
+            response = requests.post(API_ENDPOINT, json=data, headers=headers)
+            response.raise_for_status()
+            print(f"Data sent successfully: {response.json()}")
+            return True
+
         except requests.exceptions.RequestException as e:
             print(f"Error sending data: {response.json()}")
             return False
@@ -244,116 +309,56 @@ def main():
             print(f"Failed to send data for device: {deviceuuid}")
         # time.sleep(1)  # 增加延遲以避免過快發送請求
 
-def get_ami_data():
-    API_ENDPOINT = f'{ENDPOINT}/api/getamidata/'
-    
-    data = {
-        "electricnumber": "01234567890",
-        "account":"0900123456",
-        "start": "1701561600000",
-    }    
-    TOKEN = "6875193b5449f4e12b0ff81ec632a77cefe1fd2d"
-    # TOKEN = "7488b1681692f0dfbda173ace66f2a2421673302"
-    headers = {'Authorization': f'Token {TOKEN}'}
-    
-    try:
-        response = requests.post(API_ENDPOINT, json=data, headers=headers)
-        response.raise_for_status()
-        print(f"Data sent successfully: {response.json()}")
-        
-        # print(f"Data sent successfully: {data['deviceuuid']}")
-        return True
-    except requests.exceptions.RequestException as e:
-        print(f"Error sending data: {response.json()}")
-        return False
-
-def register_electricnumber_to_device():
-    API_ENDPOINT = f'{ENDPOINT}/api/register_electricnumber_to_device/'
-    data = {
-        'electricnumber': '01234567890',
-        'deviceuuid':  '8dc09891-2d5f-46fc-9947-043ba422c452',
-        'registered': 1,
-        'account':'0900123456',
-        'createtime': "2024-10-23",
-    }
-    TOKEN = "6875193b5449f4e12b0ff81ec632a77cefe1fd2d"
-    headers = {'Authorization': f'Token {TOKEN}'}
-    
-    try:
-        response = requests.post(API_ENDPOINT, json=data, headers=headers)
-        response.raise_for_status()
-        print(f"Data sent successfully: {response.json()}")
-
-        return True
-    except requests.exceptions.RequestException as e:
-        print(f"Error sending data: {response.json()}")
-        return False
-
-def get_user_data():
-    API_ENDPOINT = f'{ENDPOINT}/api/userinfo/'
-    data = {
-        "account": "0900123456",
-    }
-    TOKEN = "6875193b5449f4e12b0ff81ec632a77cefe1fd2d"
-    headers = {'Authorization': f'Token {TOKEN}'}
-    
-    try:
-        response = requests.post(API_ENDPOINT, json=data, headers=headers)
-        response.raise_for_status()
-        print(f"Data sent successfully: {response.json()}")
-
-        return True
-    except requests.exceptions.RequestException as e:
-        print(f"Error sending data: {response.json()}")
-        return False
-
-def get_user_token():
-    API_ENDPOINT = f'{ENDPOINT}/api/api-token-auth/'
-    data = {
-        "username": "0900123456",
-    }
-    TOKEN = "52542783702f7051ae2663133e084b67f1b9eea8"
-    headers = {'Authorization': f'Token {TOKEN}'}
-    
-    try:
-        response = requests.post(API_ENDPOINT, json=data, headers=headers)
-        response.raise_for_status()
-        print(f"Data sent successfully: {response.json()}")
-
-        return True
-    except requests.exceptions.RequestException as e:
-        print(f"Error sending data: {e}")
-        return False
 
 if __name__ == "__main__":
 
-    # data = {
-    #     "deviceuuid": '8dc09891-2d5f-46fc-9947-043ba422c452',
-    #     "name": "name1",  # 假設所有設備都是 'name1'，根據需要調整
-    #     "createtime": '2023-10-23'
-    # }
-    # data = {
-    #     'username':'0900123456',
-    #     'password':'012345678'
-
-    # }
-    # user1 = User()
-    # user1.register(data)
-
-
+    '''
+    註冊使用者帳號
+    '''
     # data = {
     #     'username':'0900123456',
     #     'password':'012345678'
 
     # }
     # user1 = Customer()
-    # user1.info(data)    
+    # user1.register(data)
 
 
+    # data = {
+    #     'electricnumber':'01234567890'
+    # }
+    # user1 = Customer()
+    # user1.banding(data)    
+
+    '''
+    註冊/啟用/停用/電號
+    '''
+    # data = {
+        
+    #     'electricnumber':'01234567890',
+
+    # }
+    # admin = Admin().ElectricNumber()
+    # admin.register(data)  #註冊 
+    # admin.disable(data)  #停用
+
+    '''
+    註冊裝置
+    '''
+    # data = {
+    #     "deviceuuid": '8dc09891-2d5f-46fc-9947-043ba422c452',
+    #     "name": "設備1"
+    # }
+    # admin = Admin().Device()
+    # # admin.disable(data)
+    # admin.register(data)      
+    '''
+      綁定電號和裝置
+    '''
     data = {
-        'electricnumber':'12345678910',
-        'deviceuuid':'8dc09891-2d5f-46fc-9947-043ba422c452'
+        "deviceuuid": '8dc09891-2d5f-46fc-9947-043ba422c452',
+        'electricnumber':'01234567890',
     }
     admin = Admin().ElectricNumber_Device_Band()
-    # admin.rename(data)   
-    admin.band(data)  
+    admin.band(data)       
+    

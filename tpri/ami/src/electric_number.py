@@ -14,27 +14,35 @@ class MyElectricNumber(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request):
         
-        serializer = ElectricNumber_Update_Serializer(data=request.data)
+    def patch(self, request):
+
+        electricnumber = request.data.get('electricnumber')
+        if not electricnumber:
+            return Response({
+                'status': '0',
+                'reason': 'electricnumber is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            electric = ElectricNumber.objects.get(electricnumber=electricnumber)
+        except ElectricNumber.DoesNotExist:
+            return Response({
+                'status': '0',
+                'reason': 'electricnumber not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ElectricNumber_Update_Serializer(electric, data=request.data, partial=True)
         
         if serializer.is_valid():
-
-            try:
-                electricnumber = ElectricNumber.objects.get(electricnumber=serializer.validated_data['electricnumber'])
-                electricnumber.name = serializer.validated_data['name']
-                electricnumber.save()   
-                return Response({
-                    "status": "1"
-                }, status=status.HTTP_200_OK)
-
-            except ElectricNumber.DoesNotExist:
-                return Response({
-                    "status": "0",
-                    "reason": "electricnumber not found"
-                }, status=status.HTTP_404_NOT_FOUND)
-        return Response({
-            "status": "0",
-            "reason": f"Invalid data {serializer.errors}"
-        }, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer.save()
+            return Response({
+                'status': '1',
+                'reason': 'Success'
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'status': '0',
+                'reason': f"Invalid data {serializer.errors}"
+            }, status=status.HTTP_400_BAD_REQUEST)

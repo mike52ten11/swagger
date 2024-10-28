@@ -14,14 +14,14 @@ class MyElectricNumberDeviceBindingView(APIView):
                 with transaction.atomic():
                     # 創建綁定記錄
                     binding = ElectricNumber_Device_Band.objects.create(
-                        electric=serializer.validated_data['electric'],
+                        electricnumber=serializer.validated_data['electricnumber'],
                         device=serializer.validated_data['device']
                     )
                     
                     return Response({
                         "message": "Binding successful",
                         "data": {
-                            "electricnumber": binding.electric.electricnumber,
+                            "electricnumber": binding.electricnumber.electricnumber,
                             "deviceuuid": binding.device.deviceuuid,
                             "registered": binding.registered,
                             "createtime": binding.createtime
@@ -42,7 +42,7 @@ class MyElectricNumberDeviceBindingView(APIView):
         if serializer.is_valid():
             try:
                 binding = ElectricNumber_Device_Band.objects.get(
-                    electric=serializer.validated_data['electric'],
+                    electricnumber=serializer.validated_data['electricnumber'],
                     device=serializer.validated_data['device']
                 )
                 binding.delete()
@@ -64,14 +64,14 @@ class MyElectricNumberDeviceBindingView(APIView):
         
         filters = {}
         if electricnumber:
-            filters['electric__electricnumber'] = electricnumber
+            filters['electricnumber__electricnumber'] = electricnumber
         if deviceuuid:
             filters['device__deviceuuid'] = deviceuuid
             
         bindings = ElectricNumber_Device_Band.objects.filter(**filters)
         
         data = [{
-            "electricnumber": binding.electric.electricnumber,
+            "electricnumber": binding.electricnumber.electricnumber,
             "deviceuuid": binding.device.deviceuuid,
             "registered": binding.registered,
             "createtime": binding.createtime

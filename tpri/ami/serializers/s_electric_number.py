@@ -10,9 +10,10 @@ class ElectricNumberSerializer(serializers.ModelSerializer):
         fields = ['electricnumber', 'name']
 
 class ElectricNumber_Update_Serializer(serializers.ModelSerializer):
+    
     class Meta:
         model = ElectricNumber
-        fields = ['electricnumber', 'name']
+        fields = ['electricnumber', 'name', 'registered']
         extra_kwargs = {
             'electricnumber': {
                 'validators': []  # 移除 UniqueValidator 用於更新操作

@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
-from ..models import PowerUser
+
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -19,13 +19,4 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         return user
 
-class PowerUserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = PowerUser
-        fields = ['account', 'electricnumber','registered','regdate']
-
-
-class PowerUserInfoSerializer(serializers.Serializer):
-    account = serializers.CharField(max_length=10)
 
