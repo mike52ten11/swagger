@@ -9,7 +9,8 @@ from zoneinfo import ZoneInfo
 # 配置
 LOCAL_DB_PATH = r'db.sqlite3'
 ENDPOINT = 'http://10.52.15.201:80'
-TOKEN = 'ee10d9bdfa9eff10eb9321a71a7cebeeb65f2fd4'
+TOKEN = 'cf631298f59a37ad6fdbb056293383314789eb06'
+# TOKEN = 'ea2864ed6b3a46ff0d011106f8813c56200d5cd5'
 Admin_TOKEN = '43087078d191b314f9350084b27e7f7b6071fe18'
 
 class Admin:
@@ -193,6 +194,37 @@ class Admin:
             except requests.exceptions.RequestException as e:
                 print(f"Error sending data: {response.json()}")
                 return False
+    
+    class AMIdata:
+
+       def create(self, data):
+            API_ENDPOINT = f'{ENDPOINT}/ami-api/ami-data/'
+            headers = {'Authorization': f'Token {Admin_TOKEN}'}       
+            
+            try:
+                response = requests.post(API_ENDPOINT, json=data, headers=headers)
+                response.raise_for_status()
+                print(f"Data sent successfully: {response.json()}")
+                return True
+
+            except requests.exceptions.RequestException as e:
+                print(f"Error sending data: {response.json()}")
+                return False
+
+       def delete(self, data):
+            API_ENDPOINT = f'{ENDPOINT}/ami-api/ami-data/'
+            headers = {'Authorization': f'Token {Admin_TOKEN}'}       
+
+            try:
+                response = requests.delete(API_ENDPOINT, json=data, headers=headers)
+                response.raise_for_status()
+                print(f"Data sent successfully: {response.json()}")
+                return True
+
+            except requests.exceptions.RequestException as e:
+                print(f"Error sending data: {response.json()}")
+                return False
+                    
 
 class Customer:
 
@@ -226,13 +258,50 @@ class Customer:
             print(f"Error sending data: {response.json()}")
             return False
 
+    def banding_info(self, data):
+        API_ENDPOINT = f'{ENDPOINT}/ami-api/user-binding/'
+        headers = {
+            'Authorization': f'Token {TOKEN}',
+            'Content-Type': 'application/json'
+        }        
+        
+        try:
+            response = requests.get(API_ENDPOINT, json=data, headers=headers)
+            response.raise_for_status()
+            print(f"Data sent successfully: {response.json()}")
+            return True
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error sending data: {response.json()}")
+            return False
+
 
     def info(self, data):
         API_ENDPOINT = f'{ENDPOINT}/ami-api/token/'
         
+        headers = {
+            'Authorization': f'Token {TOKEN}',
+            'Content-Type': 'application/json'
+        }           
+        try:
+            response = requests.post(API_ENDPOINT, json=data, )
+            response.raise_for_status()
+            print(f"Data sent successfully: {response.json()}")
+            return True
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error sending data: {response.json()}")
+            return False
+
+    def get_ami_data(self, data):
+        API_ENDPOINT = f'{ENDPOINT}/ami-api/ami-data/'
+        headers = {
+            'Authorization': f'Token {TOKEN}',
+            'Content-Type': 'application/json'
+        }              
         
         try:
-            response = requests.post(API_ENDPOINT, json=data)
+            response = requests.get(API_ENDPOINT, json=data, headers=headers)
             response.raise_for_status()
             print(f"Data sent successfully: {response.json()}")
             return True
@@ -243,23 +312,6 @@ class Customer:
 
 
 
-
-
-class ComparisonTable:
-
-    def electricnumber_device(self): #一對一    
-        pass
-
-    def user_electricnumber(self):   #一對多 
-        pass
-
-class AMIData:
-
-    def send(self):    
-        pass
-
-    def get(self):    
-        pass
 
 
 def read_data_from_sqlite():
@@ -299,7 +351,7 @@ def main():
         deviceuuid, generatedTime, value = row
         data = {
             "deviceuuid": deviceuuid,
-            "name": "name1",  # 假設所有設備都是 'name1'，根據需要調整
+            "name": "設備1",  # 假設所有設備都是 'name1'，根據需要調整
             "value": value,
             "datatime": generatedTime,
             "createtime": int(time.time())
@@ -307,40 +359,28 @@ def main():
         success = send_data_to_server(data)
         if not success:
             print(f"Failed to send data for device: {deviceuuid}")
+            
         # time.sleep(1)  # 增加延遲以避免過快發送請求
 
 
 if __name__ == "__main__":
 
-    '''
-    註冊使用者帳號
-    '''
-    # data = {
-    #     'username':'0900123456',
-    #     'password':'012345678'
-
-    # }
-    # user1 = Customer()
-    # user1.register(data)
 
 
-    # data = {
-    #     'electricnumber':'01234567890'
-    # }
-    # user1 = Customer()
-    # user1.banding(data)    
+  
 
     '''
     註冊/啟用/停用/電號
     '''
     # data = {
         
-    #     'electricnumber':'01234567890',
+    #     'electricnumber':'12345678910',
 
     # }
     # admin = Admin().ElectricNumber()
     # admin.register(data)  #註冊 
     # admin.disable(data)  #停用
+    # admin.enable(data)  #停用
 
     '''
     註冊裝置
@@ -355,10 +395,63 @@ if __name__ == "__main__":
     '''
       綁定電號和裝置
     '''
+    # data = {
+    #     "deviceuuid": '8dc09891-2d5f-46fc-9947-043ba422c452',
+    #     'electricnumber':'01234567890',
+    # }
+    # admin = Admin().ElectricNumber_Device_Band()
+    # admin.band(data) # 綁定  
+       
+    #查詢綁定電號和裝置的資訊 
+    # data = {
+    #     'electricnumber':'01234567890',
+    # }
+    # admin = Admin().ElectricNumber_Device_Band() 
+    # admin.info(data) #查詢    
+    '''
+        註冊使用者帳號
+    '''
+    # data = {
+    #     'username':'0912345678',
+    #     'password':'012345678'
+
+    # }
+    # user1 = Customer()
+    # user1.register(data)
+    '''
+        綁定使用者和電號 
+    '''
+    # data = {
+        
+    # }
+    # user1 = Customer()
+    # # user1.banding(data)  
+    # user1.banding_info(data)
+
+
+    # data = {
+    #     "deviceuuid": '8dc09891-2d5f-46fc-9947-043ba422c452',
+    #     "name": "設備1",  # 假設所有設備都是 'name1'，根據需要調整
+    #     "value": '9238.820000',
+    #     "datatime": '1701561600000',
+    # }
+    # admin = Admin().AMIdata() 
+    # admin.create(data) #新增 
+
+    ## 刪除
+    # data = {
+    #     "deviceuuid": '8dc09891-2d5f-46fc-9947-043ba422c452',
+    #     # "name": "設備1",  # 假設所有設備都是 'name1'，根據需要調整
+    #     # "value": '9238.820000',
+    #     "datatime": '1701561600000',
+    # }
+    # admin = Admin().AMIdata() 
+    # admin.delete(data) #刪除   
+
+    ##取得
     data = {
-        "deviceuuid": '8dc09891-2d5f-46fc-9947-043ba422c452',
-        'electricnumber':'01234567890',
+        
+        "datatime": '1701561600000',
     }
-    admin = Admin().ElectricNumber_Device_Band()
-    admin.band(data)       
-    
+    user1 = Customer() 
+    user1.get_ami_data(data) #新增
