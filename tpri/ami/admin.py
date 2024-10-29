@@ -3,7 +3,8 @@ from .models import (   User,
                         User_Banding_ElectricNumber, 
                         Device, 
                         ElectricNumber, 
-                        ElectricNumber_Device_Band
+                        ElectricNumber_Device_Band,
+                        AMIData
                     )
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.admin import TokenAdmin
@@ -17,13 +18,19 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(User_Banding_ElectricNumber)
 class PowerUserAdmin(admin.ModelAdmin):
     list_display = ['electricnumber', 'user', 'registered', 'regdate']
-    search_fields = ['electricnumber', 'user']
+    search_fields = ['electricnumber__electricnumber', 'user__username']
 
 @admin.register(Device)
 class DeviceAdmin(admin.ModelAdmin):
     list_display = ['deviceuuid', 'name', 'createtime']
     list_filter = ['name']
     search_fields = ['deviceuuid']
+
+@admin.register(AMIData)
+class AMIDataAdmin(admin.ModelAdmin):
+    list_display = ['deviceuuid', 'name', 'value','datatime','createtime']
+    list_filter = ['deviceuuid','datatime']
+    search_fields = ['deviceuuid','datatime']
 
 @admin.register(ElectricNumber)
 class ElectricNumberAdmin(admin.ModelAdmin):
@@ -78,16 +85,3 @@ class ElectricNumber_Device_Band_Admin(admin.ModelAdmin):
         if db_field.name == "device":
             kwargs["queryset"] = Device.objects.filter(registered=True)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-# @admin.register(ElectricNumber_Device_Band)
-# class ElectricNumber_Device_Band_Admin(admin.ModelAdmin):
-#     list_display = ['electric', 'device']
-#     list_filter = ['electric']
-#     search_fields = ['electric']
-
-# Register your models here.
-
-# @admin.register(Token)
-# class CustomTokenAdmin(TokenAdmin):
-#     list_display = ('key', 'user', 'created')
-#     fields = ('user',)
-#     ordering = ('-created',)

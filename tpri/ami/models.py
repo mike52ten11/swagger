@@ -50,7 +50,7 @@ class Device(models.Model):
         # 更新相關的綁定記錄
         bands = ElectricNumber_Device_Band.objects.filter(device=self)
         for band in bands:
-            band.registered = band.electric.registered and self.registered
+            band.registered = band.electricnumber.registered and self.registered
             band.save(update_fields=['registered'])
 
 class ElectricNumber(models.Model):
@@ -69,7 +69,7 @@ class ElectricNumber(models.Model):
         bands = ElectricNumber_Device_Band.objects.filter(electricnumber=self)
         print(self.registered)
         for band in bands:
-            band.registered = band.electric.registered and self.registered
+            band.registered = band.electricnumber.registered and self.registered
             band.save(update_fields=['registered'])
 
 
@@ -132,7 +132,7 @@ class ElectricNumber_Device_Band(models.Model):
         # 檢查是否已經存在相關的綁定
         if not self.pk:  # 只在創建新記錄時檢查
             existing_electric = ElectricNumber_Device_Band.objects.filter(
-                electricnumber=self.electric
+                electricnumber=self.electricnumber
             ).exists()
             
             existing_device = ElectricNumber_Device_Band.objects.filter(
@@ -158,3 +158,20 @@ class ElectricNumber_Device_Band(models.Model):
         return f"{self.electricnumber.electricnumber} - {self.device.deviceuuid}"
 
 
+class AMIData(models.Model):
+
+    deviceuuid = models.CharField(max_length=36)  # 假設 UUID 是 36 字符長
+    name = models.CharField(max_length=10, null=True, blank=True)
+    value = models.FloatField()
+    datatime = models.BigIntegerField()  # 用於存儲 Unix timestamp
+    createtime = models.DateTimeField(auto_now_add=True)  # 用於存儲 Unix timestamp
+
+    class Meta:
+        unique_together = ('deviceuuid', 'name', 'datatime')
+        indexes = [
+            models.Index(fields=['deviceuuid', 'name']),
+            models.Index(fields=['datatime']),
+        ]
+
+    def __str__(self):
+        return f"The {self.deviceuuid} - {self.name} value of {self.datatime} is {self.value} and the creation date is  {self.createtime}"    

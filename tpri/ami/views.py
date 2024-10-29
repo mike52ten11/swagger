@@ -42,6 +42,10 @@ from .src.electricnumber_device_band import    (     MyElectricNumberDeviceBindi
 from .src.user_electricnumber_band import    (     MyUserElectricNumberBindingView
 
                                                  )     
+from .src.ami_data import    (     MyAMIDataView
+
+                                                 )   
+                                                 
                                                                                                      
 '''
  一般使用者的api
@@ -217,6 +221,7 @@ class ElectricNumberDeviceBindingView(APIView):
 
 
 class UserElectricNumberBindingView(APIView):
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAdminOrAllowedEndpoint]
     def post(self, request):
         return MyUserElectricNumberBindingView().post(request)
@@ -224,4 +229,35 @@ class UserElectricNumberBindingView(APIView):
         return MyUserElectricNumberBindingView().delete(request)
     def get(self, request):  
         return MyUserElectricNumberBindingView().get(request)          
-                            
+
+
+class AMIDataView(APIView):
+    # authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminOrAllowedEndpoint]
+    def post(self, request):
+        if not request.user.is_staff:
+            return Response(
+                {"error": "只有管理員可以刪除數據"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )           
+        return MyAMIDataView().create(request)
+
+    def delete(self, request):
+        if not request.user.is_staff:
+            return Response(
+                {"error": "只有管理員可以刪除數據"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )        
+        return MyAMIDataView().delete(request)
+
+    def patch(self, request):
+        if not request.user.is_staff:
+            return Response(
+                {"error": "只有管理員可以刪除數據"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )           
+        return MyAMIDataView().patch(request)
+
+    def get(self, request):  
+        
+        return MyAMIDataView().get_ami_data(request)  

@@ -13,6 +13,22 @@ class MyUserElectricNumberBindingView(APIView):
         serializer = UserElectricNumberBindingSerializer(data=request.data)
         
         if serializer.is_valid():
+            # 檢查是否已存在相同的綁定
+            existing_binding = User_Banding_ElectricNumber.objects.filter(
+                user=request.user,
+                electricnumber=serializer.validated_data['electricnumber']
+            ).first()
+            
+            if existing_binding:
+                return Response({
+                    "message": "Binding already exists",
+                    # "data": {
+                    #     "account": existing_binding.account,
+                    #     "electricnumber": existing_binding.electricnumber.electricnumber,
+                    #     "registered": existing_binding.registered,
+                    #     "regdate": existing_binding.regdate
+                    # }
+                }, status=status.HTTP_400_BAD_REQUEST)            
             try:
                 with transaction.atomic():
                     # 創建綁定記錄
